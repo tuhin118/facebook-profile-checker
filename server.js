@@ -12,7 +12,10 @@ app.use(express.static("public"));
 const API_URL =
   "https://prod.api.market/api/v1/osint-trace-1/facebook-checker/check/facebook";
 
-// Health check
+// ===============================
+// HEALTH CHECK
+// ===============================
+
 app.get("/api/health", (req, res) => {
   res.json({
     status: "online",
@@ -20,7 +23,10 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Safe response-structure logger
+// ===============================
+// SAFE RESPONSE STRUCTURE
+// ===============================
+
 function getSafeStructure(value, depth = 0) {
   if (depth > 4) {
     return "[nested object]";
@@ -78,7 +84,10 @@ function getSafeStructure(value, depth = 0) {
   };
 }
 
-// Facebook checker API
+// ===============================
+// FACEBOOK CHECKER
+// ===============================
+
 app.post("/api/check-facebook", async (req, res) => {
   const { input } = req.body;
 
@@ -94,9 +103,9 @@ app.post("/api/check-facebook", async (req, res) => {
     });
   }
 
+  // API key
   const apiKey = process.env.API_MARKET_KEY;
 
-  // Check API key
   if (!apiKey) {
     return res.status(500).json({
       success: false,
@@ -105,6 +114,10 @@ app.post("/api/check-facebook", async (req, res) => {
   }
 
   try {
+    // ===============================
+    // API REQUEST
+    // ===============================
+
     const apiResponse = await fetch(API_URL, {
       method: "POST",
 
@@ -119,8 +132,11 @@ app.post("/api/check-facebook", async (req, res) => {
       })
     });
 
-    // Try to parse JSON safely
-    let data;
+    // ===============================
+    // READ RESPONSE
+    // ===============================
+
+    let data = {};
 
     try {
       data = await apiResponse.json();
@@ -128,10 +144,23 @@ app.post("/api/check-facebook", async (req, res) => {
       data = {};
     }
 
-    // Safe debug information
+    // ===============================
+    // SAFE LOGS
+    // ===============================
+
     console.log(
       "API STATUS:",
       apiResponse.status
+    );
+
+    console.log(
+      "API LIVE VALUE:",
+      data.live
+    );
+
+    console.log(
+      "API NOTE:",
+      data.note || ""
     );
 
     console.log(
@@ -143,7 +172,10 @@ app.post("/api/check-facebook", async (req, res) => {
       )
     );
 
-    // API error
+    // ===============================
+    // API ERROR
+    // ===============================
+
     if (!apiResponse.ok) {
       return res.status(apiResponse.status).json({
         success: false,
@@ -151,17 +183,16 @@ app.post("/api/check-facebook", async (req, res) => {
       });
     }
 
-    /*
-     * Current API response observed from Render:
-     *
-     * {
-     *   live: boolean,
-     *   note: string
-     * }
-     *
-     * Do not assume profile metadata exists
-     * unless the API actually returns it.
-     */
+    // ===============================
+    // PROFILE DATA
+    // ===============================
+    //
+    // The API currently observed only
+    // returns "live" and "note".
+    //
+    // Do not invent profile information
+    // that the API did not return.
+    //
 
     const profile = {
       live:
@@ -187,12 +218,17 @@ app.post("/api/check-facebook", async (req, res) => {
           : ""
     };
 
+    // ===============================
+    // SUCCESS RESPONSE
+    // ===============================
+
     return res.json({
       success: true,
       profile
     });
 
   } catch (error) {
+
     console.error(
       "API Error:",
       error.message
@@ -206,7 +242,10 @@ app.post("/api/check-facebook", async (req, res) => {
   }
 });
 
-// Start server
+// ===============================
+// START SERVER
+// ===============================
+
 app.listen(PORT, () => {
   console.log("Server started successfully");
   console.log("PORT VALUE:", PORT);
