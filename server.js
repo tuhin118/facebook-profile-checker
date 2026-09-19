@@ -9,6 +9,9 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static("public"));
 
+const API_URL =
+  "https://prod.api.market/api/v1/osint-trace-1/facebook-checker/check/facebook";
+
 app.get("/api/health", (req, res) => {
   res.json({
     status: "online",
@@ -26,7 +29,9 @@ app.post("/api/check-facebook", async (req, res) => {
     });
   }
 
-  if (!process.env.API_MARKET_KEY) {
+  const apiKey = process.env.API_MARKET_KEY;
+
+  if (!apiKey) {
     return res.status(500).json({
       success: false,
       message: "API key is not configured."
@@ -34,20 +39,55 @@ app.post("/api/check-facebook", async (req, res) => {
   }
 
   try {
-    // API request will be added here after
-    // we confirm the exact API.market endpoint/response format.
+    const apiResponse = await fetch(API_URL, {
+      method: "POST",
 
-    res.json({
-      success: false,
-      message: "API connection is not configured yet."
+      headers: {
+        "accept": "application/json",
+        "x-api-market-key": apiKey,
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        input: input.trim()
+      })
+    });
+
+    const data = await apiResponse.json();
+
+    if (!apiResponse.ok) {
+      return res.status(apiResponse.status).json({
+        success: false,
+        message: "API request failed.",
+        details: data
+      });
+    }
+
+    const root = data.root || {};
+    const metadata = root.metadata || {};
+
+    return res.json({
+      success: true,
+
+      profile: {
+        live: root.live ?? null,
+        name: metadata.name || null,
+        id: metadata.user_id || null,
+        avatar: metadata.avatar_url || null,
+        customAvatar: metadata.has_custom_avatar ?? null,
+        profileUrl: metadata.profile_url || null,
+        linkedAccounts: metadata.linked_accounts || []
+      },
+
+      note: root.note || ""
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("API Error:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Unable to contact the API."
+      message: "Unable to contact the verification service."
     });
   }
 });
