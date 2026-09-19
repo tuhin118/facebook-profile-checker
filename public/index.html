@@ -1,137 +1,129 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>FB PROFILE // CHECKER</title>  <link rel="stylesheet" href="style.css">
+</head><body>  <main class="container"><header>
+  <div class="logo">◈ FB PROFILE // SYSTEM</div>
 
-  <title>FB PROFILE // CHECKER</title>
+  <h1>PROFILE CHECKER</h1>
 
-  <link rel="stylesheet" href="style.css">
-</head>
+  <p class="subtitle">
+    Facebook profile information lookup
+  </p>
+</header>
 
-<body>
+<section class="panel">
 
-  <main class="container">
+  <label for="searchInput">
+    EMAIL OR PHONE NUMBER
+  </label>
 
-    <header>
-      <div class="logo">◈ FB PROFILE // SYSTEM</div>
+  <div class="input-wrap">
 
-      <h1>PROFILE CHECKER</h1>
+    <input
+      id="searchInput"
+      type="text"
+      placeholder="Enter email or phone number..."
+      autocomplete="off"
+    >
 
-      <p class="subtitle">
-        Facebook profile information lookup
-      </p>
-    </header>
+    <button id="checkBtn">
+      CHECK
+    </button>
 
+  </div>
 
-    <section class="panel">
+  <div id="status" class="status">
+    Waiting for input...
+  </div>
 
-      <label for="searchInput">
-        EMAIL OR PHONE NUMBER
-      </label>
+  <div id="result" class="result">
 
-      <div class="input-wrap">
+    <div class="profile">
 
-        <input
-          id="searchInput"
-          type="text"
-          placeholder="Enter email or phone number..."
-          autocomplete="off"
+      <div class="avatar-wrap">
+
+        <img
+          id="avatar"
+          class="avatar"
+          src=""
+          alt="Profile"
         >
 
-        <button id="checkBtn">
-          CHECK
-        </button>
+        <span
+          id="avatarBadge"
+          class="badge"
+        ></span>
 
       </div>
 
+      <div class="info">
 
-      <div id="status" class="status">
-        Waiting for input...
-      </div>
+        <h2 id="profileName">
+          Unknown Profile
+        </h2>
 
+        <p>
+          Facebook UID:
+          <span id="profileId">—</span>
+        </p>
 
-      <div id="result" class="result">
+        <p>
+          Linked Accounts:
+          <span id="instagram">—</span>
+        </p>
 
-        <div class="profile">
-
-          <img
-            id="avatar"
-            class="avatar"
-            src=""
-            alt="Profile"
-          >
-
-          <div class="info">
-
-            <h2 id="profileName">
-              Unknown Profile
-            </h2>
-
-            <p>
-              Facebook UID:
-              <span id="profileId">—</span>
-            </p>
-
-            <p>
-              Linked Accounts:
-              <span id="instagram">—</span>
-            </p>
-
-            <a
-              id="profileLink"
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="profile-link"
-            >
-              Open Facebook Profile
-            </a>
-
-            <span
-              id="avatarBadge"
-              class="badge"
-            >
-              CUSTOM AVATAR: —
-            </span>
-
-          </div>
-
-        </div>
-
-
-        <div class="details">
-
-          <div class="detail-card">
-            <span class="detail-label">ACCOUNT STATUS</span>
-            <strong id="accountStatus">UNKNOWN</strong>
-          </div>
-
-          <div class="detail-card">
-            <span class="detail-label">CUSTOM AVATAR</span>
-            <strong id="customAvatar">—</strong>
-          </div>
-
-          <div class="detail-card">
-            <span class="detail-label">NOTE</span>
-            <strong id="profileNote">—</strong>
-          </div>
-
-        </div>
+        <a
+          id="profileLink"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="profile-link"
+        >
+          Open Facebook Profile
+        </a>
 
       </div>
 
-    </section>
+    </div>
 
+    <div class="details">
 
-    <footer class="footer">
-      FB PROFILE CHECKER // PUBLIC INFORMATION ONLY
-    </footer>
+      <div class="detail-card">
+        <span class="detail-label">ACCOUNT STATUS</span>
+        <strong id="accountStatus">UNKNOWN</strong>
+      </div>
 
-  </main>
+      <div class="detail-card custom-avatar-card">
 
+        <span class="detail-label">CUSTOM AVATAR</span>
 
-  <script src="app.js"></script>
+        <img
+          id="customAvatar"
+          class="custom-avatar"
+          src=""
+          alt="Custom Avatar"
+        >
 
-</body>
+      </div>
+
+      <div class="detail-card">
+
+        <span class="detail-label">NOTE</span>
+
+        <strong id="profileNote">—</strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<footer class="footer">
+  FB PROFILE CHECKER // PUBLIC INFORMATION ONLY
+</footer>
+
+  </main>  <script src="app.js"></script></body>
 </html>
