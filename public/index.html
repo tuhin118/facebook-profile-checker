@@ -3,11 +3,102 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Facebook Profile Checker</title>
+
+  <title>FB PROFILE // CHECKER</title>
+
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <h1>Facebook Profile Checker</h1>
+  <main class="container">
+
+    <header>
+      <div class="logo">◈ FB PROFILE // SYSTEM</div>
+
+      <h1>PROFILE CHECKER</h1>
+
+      <p class="subtitle">
+        Facebook profile information lookup
+      </p>
+    </header>
+
+
+    <section class="panel">
+
+      <label for="searchInput">
+        EMAIL OR PHONE NUMBER
+      </label>
+
+      <div class="input-wrap">
+
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Enter email or phone number..."
+          autocomplete="off"
+        >
+
+        <button id="checkBtn">
+          CHECK
+        </button>
+
+      </div>
+
+
+      <div id="status" class="status">
+        Waiting for input...
+      </div>
+
+
+      <div id="result" class="result">
+
+        <div class="profile">
+
+          <img
+            id="avatar"
+            class="avatar"
+            src=""
+            alt="Profile"
+          >
+
+          <div class="info">
+
+            <h2 id="profileName">
+              Unknown Profile
+            </h2>
+
+            <p>
+              Profile ID:
+              <span id="profileId">—</span>
+            </p>
+
+            <p>
+              Instagram:
+              <span id="instagram">—</span>
+            </p>
+
+            <span class="badge">
+              PROFILE FOUND
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <footer class="footer">
+      FB PROFILE CHECKER // PUBLIC INFORMATION ONLY
+    </footer>
+
+  </main>
+
+
+  <script src="app.js"></script>
 
 </body>
 </html>
