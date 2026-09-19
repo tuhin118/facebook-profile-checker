@@ -25,6 +25,29 @@ function resetResult() {
 }
 
 
+function displayLinkedAccounts(accounts) {
+  if (!Array.isArray(accounts) || accounts.length === 0) {
+    instagram.textContent = "None detected";
+    return;
+  }
+
+  instagram.textContent = accounts
+    .map(account => {
+      if (typeof account === "string") {
+        return account;
+      }
+
+      return (
+        account.username ||
+        account.name ||
+        account.platform ||
+        "Linked account"
+      );
+    })
+    .join(", ");
+}
+
+
 checkBtn.addEventListener("click", async () => {
 
   const input = searchInput.value.trim();
@@ -66,14 +89,6 @@ checkBtn.addEventListener("click", async () => {
     }
 
 
-    /*
-      The server will return the verified profile data.
-
-      We intentionally do not guess field names here.
-      Once we confirm the exact API.market response,
-      this section will be connected to those fields.
-    */
-
     const profile = data.profile || {};
 
 
@@ -83,8 +98,8 @@ checkBtn.addEventListener("click", async () => {
     profileId.textContent =
       profile.id || "—";
 
-    instagram.textContent =
-      profile.instagram || "—";
+
+    displayLinkedAccounts(profile.linkedAccounts);
 
 
     if (profile.avatar) {
@@ -94,7 +109,15 @@ checkBtn.addEventListener("click", async () => {
 
     resultBox.style.display = "block";
 
-    showStatus("Profile information received.");
+
+    if (profile.live === true) {
+      showStatus("Account information found.");
+    } else if (profile.live === false) {
+      showStatus("Account could not be verified.");
+    } else {
+      showStatus("Verification result received.");
+    }
+
 
   } catch (error) {
 
@@ -108,6 +131,7 @@ checkBtn.addEventListener("click", async () => {
 
     checkBtn.disabled = false;
     checkBtn.textContent = "CHECK";
+
   }
 
 });
