@@ -8,221 +8,242 @@ const profileId = document.getElementById("profileId");
 const instagram = document.getElementById("instagram");
 const avatar = document.getElementById("avatar");
 
-// New result fields
 const profileLink = document.getElementById("profileLink");
 const avatarBadge = document.getElementById("avatarBadge");
 const accountStatus = document.getElementById("accountStatus");
 const customAvatar = document.getElementById("customAvatar");
 const profileNote = document.getElementById("profileNote");
 
-
 function showStatus(message) {
-  statusBox.style.display = "block";
-  statusBox.textContent = message;
+statusBox.style.display = "block";
+statusBox.textContent = message;
 }
-
 
 function resetResult() {
-  resultBox.style.display = "none";
+resultBox.style.display = "none";
 
-  profileName.textContent = "Unknown Profile";
-  profileId.textContent = "—";
-  instagram.textContent = "—";
+profileName.textContent = "Unknown Profile";
+profileId.textContent = "—";
+instagram.textContent = "—";
 
-  if (avatar) {
-    avatar.src = "";
-  }
+avatar.src = "";
 
-  if (profileLink) {
-    profileLink.textContent = "—";
-    profileLink.href = "#";
-    profileLink.style.display = "none";
-  }
+profileLink.style.display = "none";
+profileLink.href = "#";
 
-  if (avatarBadge) {
-    avatarBadge.textContent = "";
-    avatarBadge.style.display = "none";
-  }
+avatarBadge.textContent = "";
+avatarBadge.style.display = "none";
 
-  if (accountStatus) {
-    accountStatus.textContent = "—";
-  }
+accountStatus.textContent = "UNKNOWN";
 
-  if (customAvatar) {
-    customAvatar.src = "";
-    customAvatar.style.display = "none";
-  }
+customAvatar.src = "";
+customAvatar.style.display = "none";
 
-  if (profileNote) {
-    profileNote.textContent = "—";
-  }
+profileNote.textContent = "—";
 }
-
 
 function displayLinkedAccounts(accounts) {
-  if (!Array.isArray(accounts) || accounts.length === 0) {
-    instagram.textContent = "None detected";
-    return;
-  }
 
-  instagram.textContent = accounts
-    .map(account => {
-      if (typeof account === "string") {
-        return account;
-      }
-
-      return (
-        account.username ||
-        account.name ||
-        account.platform ||
-        "Linked account"
-      );
-    })
-    .join(", ");
+if (!Array.isArray(accounts) || accounts.length === 0) {
+instagram.textContent = "None detected";
+return;
 }
 
+instagram.textContent = accounts
+.map(account => {
+
+  if (typeof account === "string") {
+    return account;
+  }
+
+  return (
+    account.username ||
+    account.name ||
+    account.platform ||
+    "Linked account"
+  );
+
+})
+.join(", ");
+
+}
 
 function displayProfile(profile) {
 
-  profileName.textContent =
-    profile.name || "Unknown Profile";
+profileName.textContent =
+profile.name || "Unknown Profile";
 
-  profileId.textContent =
-    profile.id || "—";
+profileId.textContent =
+profile.id || "—";
 
-  displayLinkedAccounts(profile.linkedAccounts);
+displayLinkedAccounts(
+profile.linkedAccounts
+);
 
+// Profile avatar
+if (profile.avatar) {
 
-  // Main avatar
-  if (profile.avatar) {
-    avatar.src = profile.avatar;
-  }
+avatar.src = profile.avatar;
 
+} else {
 
-  // Profile link
-  if (profileLink && profile.profileLink) {
-    profileLink.textContent = profile.profileLink;
-    profileLink.href = profile.profileLink;
-    profileLink.target = "_blank";
-    profileLink.rel = "noopener noreferrer";
-    profileLink.style.display = "inline-block";
-  }
+avatar.removeAttribute("src");
 
-
-  // Avatar badge
-  if (avatarBadge && profile.avatarBadge) {
-    avatarBadge.textContent = profile.avatarBadge;
-    avatarBadge.style.display = "inline-block";
-  }
-
-
-  // Account status
-  if (accountStatus) {
-
-    if (profile.accountStatus) {
-      accountStatus.textContent = profile.accountStatus;
-
-    } else if (profile.live === true) {
-      accountStatus.textContent = "Active";
-
-    } else if (profile.live === false) {
-      accountStatus.textContent = "Not verified";
-
-    } else {
-      accountStatus.textContent = "Unknown";
-    }
-  }
-
-
-  // Custom avatar
-  if (customAvatar && profile.customAvatar) {
-    customAvatar.src = profile.customAvatar;
-    customAvatar.style.display = "block";
-  }
-
-
-  // Profile note
-  if (profileNote) {
-    profileNote.textContent =
-      profile.profileNote || "No additional information.";
-  }
 }
 
+// Facebook profile link
+if (profile.profileLink) {
+
+profileLink.href = profile.profileLink;
+profileLink.textContent = "Open Facebook Profile";
+
+profileLink.target = "_blank";
+profileLink.rel = "noopener noreferrer";
+
+profileLink.style.display = "inline-block";
+
+} else {
+
+profileLink.style.display = "none";
+
+}
+
+// Custom avatar status
+if (profile.hasCustomAvatar === true) {
+
+avatarBadge.textContent = "CUSTOM AVATAR";
+avatarBadge.style.display = "inline-block";
+
+} else {
+
+avatarBadge.style.display = "none";
+
+}
+
+// Account status
+if (profile.live === true) {
+
+accountStatus.textContent = "ACTIVE";
+
+} else if (profile.live === false) {
+
+accountStatus.textContent = "NOT VERIFIED";
+
+} else {
+
+accountStatus.textContent = "UNKNOWN";
+
+}
+
+// Custom avatar is a boolean from the API,
+// so don't treat it as an image URL.
+customAvatar.style.display = "none";
+
+// Profile note
+profileNote.textContent =
+profile.profileNote ||
+"No additional information.";
+}
 
 checkBtn.addEventListener("click", async () => {
 
-  const input = searchInput.value.trim();
+const input = searchInput.value.trim();
 
-  resetResult();
+resetResult();
 
-  if (!input) {
-    showStatus("Please enter an email or phone number.");
-    return;
+if (!input) {
+
+showStatus(
+  "Please enter an email or phone number."
+);
+
+return;
+
+}
+
+checkBtn.disabled = true;
+checkBtn.textContent = "CHECKING...";
+
+showStatus(
+"Connecting to verification service..."
+);
+
+try {
+
+const response = await fetch(
+  "/api/check-facebook",
+  {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json"
+    },
+
+    body: JSON.stringify({
+      input: input
+    })
   }
-
-  checkBtn.disabled = true;
-  checkBtn.textContent = "CHECKING...";
-
-  showStatus("Connecting to verification service...");
-
-  try {
-
-    const response = await fetch("/api/check-facebook", {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        input: input
-      })
-    });
+);
 
 
-    const data = await response.json();
+const data = await response.json();
 
 
-    if (!response.ok || !data.success) {
-      throw new Error(
-        data.message || "Unable to verify this input."
-      );
-    }
+if (!response.ok || !data.success) {
+
+  throw new Error(
+    data.message ||
+    "Unable to verify this input."
+  );
+}
 
 
-    const profile = data.profile || {};
+const profile =
+  data.profile || {};
 
 
-    displayProfile(profile);
+displayProfile(profile);
 
 
-    resultBox.style.display = "block";
+resultBox.style.display = "block";
 
 
-    if (profile.live === true) {
-      showStatus("Account information found.");
+if (profile.live === true) {
 
-    } else if (profile.live === false) {
-      showStatus("Account could not be verified.");
+  showStatus(
+    "Account information found."
+  );
 
-    } else {
-      showStatus("Verification result received.");
-    }
+} else if (profile.live === false) {
 
+  showStatus(
+    "Account could not be verified."
+  );
 
-  } catch (error) {
+} else {
 
-    console.error(error);
+  showStatus(
+    "Verification result received."
+  );
+}
 
-    showStatus(
-      error.message || "Something went wrong."
-    );
+} catch (error) {
 
-  } finally {
+console.error(
+  "Frontend Error:",
+  error
+);
 
-    checkBtn.disabled = false;
-    checkBtn.textContent = "CHECK";
+showStatus(
+  error.message ||
+  "Something went wrong."
+);
 
-  }
+} finally {
+
+checkBtn.disabled = false;
+checkBtn.textContent = "CHECK";
+
+}
 
 });
