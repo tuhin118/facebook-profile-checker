@@ -19,28 +19,101 @@ service: "Facebook Profile Checker"
 });
 });
 
+function getSafeStructure(value, depth = 0) {
+
+if (depth > 4) {
+return "[nested object]";
+}
+
+if (Array.isArray(value)) {
+
+return {
+  type: "array",
+  length: value.length,
+  firstItem:
+    value.length > 0
+      ? getSafeStructure(value[0], depth + 1)
+      : null
+};
+
+}
+
+if (value !== null && typeof value === "object") {
+
+const result = {};
+
+for (const key of Object.keys(value)) {
+  result[key] = getSafeStructure(
+    value[key],
+    depth + 1
+  );
+}
+
+return result;
+
+}
+
+if (typeof value === "string") {
+return {
+type: "string",
+length: value.length
+};
+}
+
+if (typeof value === "number") {
+return {
+type: "number"
+};
+}
+
+if (typeof value === "boolean") {
+return {
+type: "boolean"
+};
+}
+
+if (value === null) {
+return null;
+}
+
+return {
+type: typeof value
+};
+}
+
 app.post("/api/check-facebook", async (req, res) => {
+
 const { input } = req.body;
 
-if (!input || typeof input !== "string" || !input.trim()) {
+if (
+!input ||
+typeof input !== "string" ||
+!input.trim()
+) {
+
 return res.status(400).json({
-success: false,
-message: "Email or phone number is required."
+  success: false,
+  message: "Email or phone number is required."
 });
+
 }
 
 const apiKey = process.env.API_MARKET_KEY;
 
 if (!apiKey) {
+
 return res.status(500).json({
-success: false,
-message: "API key is not configured."
+  success: false,
+  message: "API key is not configured."
 });
+
 }
 
 try {
+
 const apiResponse = await fetch(API_URL, {
-method: "POST",
+
+  method: "POST",
 
   headers: {
     "accept": "application/json",
@@ -51,29 +124,71 @@ method: "POST",
   body: JSON.stringify({
     input: input.trim()
   })
+
 });
+
 
 const data = await apiResponse.json();
 
+
+/*
+ * SAFE DEBUG LOG
+ *
+ * This prints only the response structure.
+ * It does NOT print:
+ * - API key
+ * - input value
+ * - profile name
+ * - phone number
+ * - email
+ * - profile URL
+ * - avatar URL
+ * - UID
+ */
+
+console.log(
+  "API STATUS:",
+  apiResponse.status
+);
+
+console.log(
+  "API RESPONSE STRUCTURE:",
+  JSON.stringify(
+    getSafeStructure(data),
+    null,
+    2
+  )
+);
+
+
 if (!apiResponse.ok) {
+
   return res.status(apiResponse.status).json({
     success: false,
-    message: "API request failed.",
-    details: data
+    message: "API request failed."
   });
 }
+
 
 const root = data.root || {};
 const metadata = root.metadata || {};
 
+
 const profile = {
-  live: root.live ?? null,
 
-  name: metadata.name || null,
+  live:
+    typeof root.live === "boolean"
+      ? root.live
+      : null,
 
-  id: metadata.user_id || null,
+  name:
+    metadata.name || null,
 
-  avatar: metadata.avatar_url || null,
+  id:
+    metadata.user_id || null,
+
+  avatar:
+    metadata.avatar_url || null,
 
   hasCustomAvatar:
     metadata.has_custom_avatar ?? null,
@@ -90,6 +205,7 @@ const profile = {
     root.note || ""
 };
 
+
 return res.json({
   success: true,
   profile: profile
@@ -97,16 +213,24 @@ return res.json({
 
 } catch (error) {
 
-console.error("API Error:", error);
+console.error(
+  "API Error:",
+  error.message
+);
 
 return res.status(500).json({
   success: false,
-  message: "Unable to contact the verification service."
+  message:
+    "Unable to contact the verification service."
 });
 
 }
 });
 
 app.listen(PORT, () => {
-console.log("Server running on port ${PORT}");
+
+console.log(
+"Server running on port ${PORT}"
+);
+
 });
